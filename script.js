@@ -18,26 +18,35 @@ async function fetchAbilities() {
     const res = await fetch("https://valorant-api.com/v1/agents?isPlayableCharacter=true");
     const data = await res.json();
 
-    data.data.forEach(agent => {
-      agent.abilities.forEach((ability, idx) => {
-        if (ability.displayIcon && ability.displayName && ability.slot !== "Passive") {
-          let key = "C"; // Standard Keybind Map
-          if (ability.slot === "Ability1") key = "Q";
-          if (ability.slot === "Ability2") key = "E";
-          if (ability.slot === "Grenade") key = "C";
-          if (ability.slot === "Ultimate") key = "X";
+    allAbilities = []; // reset
 
+    data.data.forEach(agent => {
+      const slots = {
+        "Grenade": "C",
+        "Ability1": "Q",
+        "Ability2": "E",
+        "Ultimate": "X"
+      };
+
+      agent.abilities.forEach(ability => {
+        if (
+          ability.displayIcon &&
+          ability.displayIcon !== "" &&
+          ability.slot !== "Passive"
+        ) {
           allAbilities.push({
             img: ability.displayIcon,
             ability: ability.displayName,
             agent: agent.displayName,
-            key: key
+            key: slots[ability.slot] || "?"
           });
         }
       });
     });
-  } catch (e) {
-    console.error("Error loading API data:", e);
+
+    console.log("Abilities geladen:", allAbilities.length);
+  } catch (err) {
+    console.error("Fehler beim Laden der Abilities:", err);
   }
 }
 
@@ -62,7 +71,8 @@ document.getElementById("submitBtn").onclick = () => {
   if (aName === correctAbility && agName === correctAgent && key === correctKey) {
     document.getElementById("feedback").innerText = "Correct! GG!";
   } else {
-    document.getElementById("feedback").innerText = `Nope! It was "${current.ability}" by ${current.agent} on "${current.key}"`;
+    document.getElementById("feedback").innerText =
+      `Nope! It was "${current.ability}" by ${current.agent} on "${current.key}"`;
   }
 
   setTimeout(() => {
