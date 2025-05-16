@@ -32,6 +32,7 @@ async function fetchAbilities() {
         if (
           ability.displayIcon &&
           ability.displayIcon !== "" &&
+          !ability.displayIcon.includes("Leer.png") &&
           ability.slot !== "Passive"
         ) {
           allAbilities.push({
