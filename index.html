@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Valorant Ability Quiz</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="quiz-container">
+    <h1>Valorant Ability Quiz</h1>
+    <button id="startBtn">Start</button>
+
+    <div id="quiz" class="hidden">
+      <img id="abilityImg" src="" alt="Ability" />
+      <input type="text" id="abilityName" placeholder="Ability Name" />
+      <input type="text" id="agentName" placeholder="Agent Name" />
+      <select id="keybind">
+        <option value="">Select Keybind</option>
+        <option value="C">C</option>
+        <option value="Q">Q</option>
+        <option value="E">E</option>
+        <option value="X">X</option>
+      </select>
+      <button id="submitBtn">Submit</button>
+      <p id="feedback"></p>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
