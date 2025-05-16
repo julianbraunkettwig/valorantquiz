@@ -1,31 +1,49 @@
-const abilities = [
-  {
-    img: "https://static.wikia.nocookie.net/valorant/images/8/89/Paranoia.png", // Beispielbild
-    ability: "Paranoia",
-    agent: "Omen",
-    key: "Q"
-  },
-  {
-    img: "https://static.wikia.nocookie.net/valorant/images/e/e7/Leer.png",
-    ability: "Leer",
-    agent: "Reyna",
-    key: "C"
+let allAbilities = [];
+let current = null;
+
+document.getElementById("startBtn").onclick = async () => {
+  document.getElementById("feedback").innerText = "Loading abilities...";
+  await fetchAbilities();
+  if (allAbilities.length === 0) {
+    document.getElementById("feedback").innerText = "Failed to load data.";
+    return;
   }
-  // Weitere Einträge möglich...
-];
-
-let current = 0;
-
-document.getElementById("startBtn").onclick = () => {
-  current = Math.floor(Math.random() * abilities.length);
   document.getElementById("quiz").classList.remove("hidden");
   document.getElementById("startBtn").classList.add("hidden");
-  loadAbility();
+  newQuestion();
 };
 
-function loadAbility() {
-  const ability = abilities[current];
-  document.getElementById("abilityImg").src = ability.img;
+async function fetchAbilities() {
+  try {
+    const res = await fetch("https://valorant-api.com/v1/agents?isPlayableCharacter=true");
+    const data = await res.json();
+
+    data.data.forEach(agent => {
+      agent.abilities.forEach((ability, idx) => {
+        if (ability.displayIcon && ability.displayName && ability.slot !== "Passive") {
+          let key = "C"; // Standard Keybind Map
+          if (ability.slot === "Ability1") key = "Q";
+          if (ability.slot === "Ability2") key = "E";
+          if (ability.slot === "Grenade") key = "C";
+          if (ability.slot === "Ultimate") key = "X";
+
+          allAbilities.push({
+            img: ability.displayIcon,
+            ability: ability.displayName,
+            agent: agent.displayName,
+            key: key
+          });
+        }
+      });
+    });
+  } catch (e) {
+    console.error("Error loading API data:", e);
+  }
+}
+
+function newQuestion() {
+  current = allAbilities[Math.floor(Math.random() * allAbilities.length)];
+  document.getElementById("abilityImg").src = current.img;
   document.getElementById("abilityName").value = "";
   document.getElementById("agentName").value = "";
   document.getElementById("keybind").value = "";
@@ -37,20 +55,17 @@ document.getElementById("submitBtn").onclick = () => {
   const agName = document.getElementById("agentName").value.trim().toLowerCase();
   const key = document.getElementById("keybind").value;
 
-  const ability = abilities[current];
-  const correctAbility = ability.ability.toLowerCase();
-  const correctAgent = ability.agent.toLowerCase();
-  const correctKey = ability.key;
+  const correctAbility = current.ability.toLowerCase();
+  const correctAgent = current.agent.toLowerCase();
+  const correctKey = current.key;
 
   if (aName === correctAbility && agName === correctAgent && key === correctKey) {
-    document.getElementById("feedback").innerText = "Correct! Nice one!";
+    document.getElementById("feedback").innerText = "Correct! GG!";
   } else {
-    document.getElementById("feedback").innerText = `Nope! It was "${ability.ability}" by ${ability.agent} on "${ability.key}"`;
+    document.getElementById("feedback").innerText = `Nope! It was "${current.ability}" by ${current.agent} on "${current.key}"`;
   }
 
-  // Neue Frage laden
   setTimeout(() => {
-    current = Math.floor(Math.random() * abilities.length);
-    loadAbility();
-  }, 2000);
+    newQuestion();
+  }, 2500);
 };
